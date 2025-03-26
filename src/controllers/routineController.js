@@ -46,21 +46,25 @@ export const updateRoutine = async (req, res) => {
 //obtener una rutina de un usuario
 export const getRoutinesByUser = async (req, res) => {
     try {
-        const { id } = req.params;
-
-        const routine = await Routine.find({user : userId});
-
-        res.json({
-            message: 'Routine found successfully',
-            routine
-        });
+      const { userId } = req.params;
+  
+      if (req.user.role === 'admin') {
+        // Los administradores pueden obtener rutinas de cualquier usuario
+        const routines = await Routine.find({ user: userId });
+        res.status(200).json(routines);
+      } else {
+        // Los usuarios normales solo pueden obtener sus propias rutinas
+        if (userId === req.user._id.toString()) { // Compara IDs como cadenas
+          const routines = await Routine.find({ user: req.user._id });
+          res.status(200).json(routines);
+        } else {
+          res.status(403).json({ message: 'No tienes permiso para ver las rutinas de este usuario.' });
+        }
+      }
     } catch (error) {
-        console.error('Error getting routine:', error);
-        res.status(500).json({
-            message: error.message
-        })
+      res.status(500).json({ message: error.message });
     }
-}
+  };
 
 // obetener rutina por ID
 export const getRoutineById = async (req, res) => {

@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-import routineRoutes from './routes/routineRoutes.js'; 
+import routineRoutes from './routes/routineRoutes.js';
 
 dotenv.config();
 
@@ -19,10 +19,10 @@ app.use(express.json());
 connectDB();
 
 app.use('/api/auth', authRoutes);
-app.use('/api/routines', routineRoutes); // Monta el enrutador de rutinas
+app.use('/api/routines', routineRoutes);
 
 app.get('/', (req, res) => {
-    res.send('🏋️‍♂️ FitAPI');
+    res.send('️FitAPI');
 });
 
 const PORT = process.env.PORT || 4000;

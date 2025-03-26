@@ -7,7 +7,7 @@ const generateToken = (userId) => {
 }
 export const registerUser = async (req, res) => {
     try {
-        const { username, email, password,role } = req.body;
+        const { username, email, password, role } = req.body;
 
         const newUser = new user({
             username,
@@ -19,7 +19,7 @@ export const registerUser = async (req, res) => {
         const savedUser = await newUser.save();
 
         const token = generateToken(savedUser._id);
-        res.status(201).json({ user: savedUser, token});
+        res.status(201).json({ user: savedUser, token });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: error.message });
@@ -29,24 +29,25 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+        const user = await User.findOne({ email });
 
-        const foundUser = await user.findOne({ email });
-
-        if (!foundUser) {
-            return res.status(401).json({ message: 'credentials invalid' });
+        if (!user) {
+            return res.status(400).json({ message: 'User does not exist.' });
         }
 
-        const passwordMatch = await bcrypt.compare(password, foundUser.password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'credentials invalid' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid credentials.' });
         }
 
-        const token = generateToken(foundUser._id);
+        const token = jwt.sign(
+            { userId: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-        res.json({user: foundUser, token });
-    } catch (error) {
-        console.error('Error logging in user:', error);
-        res.status(500).json({ message: error.message });
+        res.status(200).json({ token });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-}
+};

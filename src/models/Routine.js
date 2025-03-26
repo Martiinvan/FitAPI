@@ -11,11 +11,11 @@ const excerciseSchema = new mongoose.Schema({
         required: true,
     },
     reps: {
-        type: Number,
+        type: String,
         required: true,
     },
     rest: {
-        type: Number,
+        type: String,
         required: true,
     },
 });
