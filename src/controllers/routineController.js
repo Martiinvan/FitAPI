@@ -2,7 +2,7 @@ import Routine from "../models/Routine.js";
 
 export const createRoutine = async (req, res) => {
     try {
-        const { user, days} = req.body;
+        const { user, days } = req.body;
 
         const newRoutine = new Routine({
             user,
@@ -46,26 +46,23 @@ export const updateRoutine = async (req, res) => {
 //obtener una rutina de un usuario
 export const getRoutinesByUser = async (req, res) => {
     try {
-      const { userId } = req.params;
-  
-      if (req.user.role === 'admin') {
-        // Los administradores pueden obtener rutinas de cualquier usuario
-        const routines = await Routine.find({ user: userId });
-        res.status(200).json(routines);
-      } else {
-        // Los usuarios normales solo pueden obtener sus propias rutinas
-        if (userId === req.user._id.toString()) { // Compara IDs como cadenas
-          const routines = await Routine.find({ user: req.user._id });
-          res.status(200).json(routines);
-        } else {
-          res.status(403).json({ message: 'No tienes permiso para ver las rutinas de este usuario.' });
-        }
-      }
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  };
+        const { userId } = req.params;
 
+        if (req.user && req.user.role === 'admin') {
+            // Los administradores pueden acceder a las rutinas de cualquier usuario
+            const routines = await Routine.find({ user: userId });
+            res.status(200).json(routines);
+        } else if (req.user && req.user._id.toString() === userId) {
+            // Los usuarios normales solo pueden acceder a sus propias rutinas
+            const routines = await Routine.find({ user: req.user._id });
+            res.status(200).json(routines);
+        } else {
+            res.status(403).json({ message: 'No tienes permisos para ver las rutinas de este usuario.' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 // obetener rutina por ID
 export const getRoutineById = async (req, res) => {
     try {
@@ -104,5 +101,5 @@ export const deleteRoutine = async (req, res) => {
     } catch (error) {
         console.error('Error deleting routine:', error);
         res.status(500).json({ message: error.message });
-    }   
+    }
 }
