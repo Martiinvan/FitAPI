@@ -1,12 +1,7 @@
-
-import User from '../models/User.js';
-
 export const verifyRole = (roles) => {
-    return async (req, res, next) => {
+    return (req, res, next) => {
         try {
-            const user = await User.findById(req.userId);
-
-            if (!user || !roles.includes(user.role)) {
+            if (!roles.includes(req.user.role)) {
                 return res.status(403).json({ message: 'No tienes permisos para esta acción' });
             }
 

@@ -1,15 +1,16 @@
-import user from "../models/User.js";
+import User from "../models/User.js"; // Cambiado a 'User' (mayúscula)
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 const generateToken = (userId) => {
     return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
+
 export const registerUser = async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
 
-        const newUser = new user({
+        const newUser = new User({ 
             username,
             email,
             password,
