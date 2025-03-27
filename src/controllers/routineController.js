@@ -46,23 +46,32 @@ export const updateRoutine = async (req, res) => {
 //obtener una rutina de un usuario
 export const getRoutinesByUser = async (req, res) => {
     try {
-        const { userId } = req.params;
-
-        if (req.user && req.user.role === 'admin') {
-            // Los administradores pueden acceder a las rutinas de cualquier usuario
-            const routines = await Routine.find({ user: userId });
-            res.status(200).json(routines);
-        } else if (req.user && req.user._id.toString() === userId) {
-            // Los usuarios normales solo pueden acceder a sus propias rutinas
-            const routines = await Routine.find({ user: req.user._id });
-            res.status(200).json(routines);
-        } else {
-            res.status(403).json({ message: 'No tienes permisos para ver las rutinas de este usuario.' });
-        }
+      const { userId } = req.params;
+  
+      console.log('req.user:', req.user); // Log del objeto req.user
+      console.log('req.params:', req.params); // Log de los parámetros de la ruta
+  
+      if (!req.user) { // Verificación adicional para asegurar que req.user esté definido
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      if (req.user.role === 'admin') {
+        const routines = await Routine.find({ user: userId });
+        console.log('Routines (admin):', routines);
+        res.status(200).json(routines);
+      } else if (req.user.userId.toString() === userId) {
+        const routines = await Routine.find({ user: req.user._id });
+        console.log('Routines (user):', routines);
+        res.status(200).json(routines);
+      } else {
+        res.status(403).json({ message: 'No tienes permisos para ver las rutinas de este usuario.' });
+      }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      console.error('Error getting routines:', error);
+      res.status(500).json({ message: error.message });
     }
-};
+  };
+
+
 // obetener rutina por ID
 export const getRoutineById = async (req, res) => {
     try {

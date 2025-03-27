@@ -1,11 +1,17 @@
 import express from 'express';
-import { createRoutine, getRoutinesByUser, getRoutineById, updateRoutine, deleteRoutine } from '../controllers/routineController.js';
+import { 
+    createRoutine, 
+    getRoutinesByUser, 
+    getRoutineById, 
+    updateRoutine, 
+    deleteRoutine 
+} from '../controllers/routineController.js';
 import { verifyToken } from '../middlewares/Auth.js';
 import { verifyRole } from '../middlewares/verifyRole.js';
 
 const router = express.Router();
 
-router.use(verifyToken); // Middleware para verificar el token de autenticación (debe ir primero)
+router.use(verifyToken); // Middleware para verificar el token de autenticación
 
 // Rutas para administradores
 router.post('/', verifyRole(['admin']), createRoutine);

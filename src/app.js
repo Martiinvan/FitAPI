@@ -11,18 +11,33 @@ dotenv.config();
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Conectar a la base de datos
 connectDB();
 
+// Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/routines', routineRoutes);
 
+// Ruta principal
 app.get('/', (req, res) => {
-    res.send('️FitAPI');
+    res.send('️FitAPI Running');
+});
+
+// Manejo de rutas no encontradas
+app.use((req, res) => {
+    res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+// Manejo de errores generales
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Error interno del servidor' });
 });
 
 const PORT = process.env.PORT || 4000;
